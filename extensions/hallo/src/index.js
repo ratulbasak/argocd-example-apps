@@ -18,6 +18,8 @@ export const Extension = (props) => {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
+            'argocd-application-name': 'argocd:guestbook',
+            'argocd-project-name': 'default'
           },
         });
 
