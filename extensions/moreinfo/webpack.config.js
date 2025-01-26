@@ -9,6 +9,7 @@ const config = {
   entry: {
     extension: "./src/index.js",
   },
+  mode: "development",
   output: {
     filename: `extensions-${extName}.js`,
     path: __dirname + `/dist/resources/extension-${extName}.js`,

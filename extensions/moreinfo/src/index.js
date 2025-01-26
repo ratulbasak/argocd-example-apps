@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import * as React from "react";
+import { useEffect, useState } from 'react';
 import ResourceCard from './Resources/Card/Card';
-// import { useApplication } from '@argoproj/argo-cd/src/hooks';
+
 
 export const MoreInfo = ( props ) => {
     const [metrics, setMetrics] = useState({
@@ -9,13 +10,14 @@ export const MoreInfo = ( props ) => {
         outOfSyncCount: 0,
     });
 
-    const { application = {}, resource, tree } = props;
-    const application_name = application?.metadata?.name || "";
+    const { application, resource, tree } = props;
+    const application_name = application.metadata.name || "";
 
-    console.log("application name: ", application_name);
+    console.log("appname: ", application_name);
+    console.log("application: ", application);
     console.log("resource: ", resource);
+    console.log("tree: ", tree);
 
-    // const { application } = useApplication(appName);
 
     useEffect(() => {
         if (application) {
