@@ -43,17 +43,37 @@ export const MoreInfo = (props) => {
         }
     }, [application, tree]);
 
+    console.log("application: ", application);
+    console.log("tree: ", tree);
     console.log("more_info: ", metrics);
 
     return (
         <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-            <div style={{ fontSize: ".7em", color: "#6d7f8b" }}>
+            <div style={{
+                width: "60px",
+                flexGrow: "1",
+                color: "#495763",
+                textAlign: "center",
+              }}
+            >
               Resources {metrics.totalResources || 0}
             </div>
-            <div style={{ fontSize: ".7em", color: "#6d7f8b" }}>
+            <div style={{
+                width: "60px",
+                flexGrow: "1",
+                color: "#495763",
+                textAlign: "center",
+              }}
+            >
               Pods {metrics.totalPods || 0}
             </div>
-            <div style={{ fontSize: ".7em", color: "#6d7f8b" }}>
+            <div style={{
+                width: "60px",
+                flexGrow: "1",
+                color: "#495763",
+                textAlign: "center",
+              }}
+            >
               Out-of-Sync {metrics.outOfSyncCount || 0}
             </div>
             {/* <ResourceCard title="Resources" value={metrics.totalResources || 0} />
