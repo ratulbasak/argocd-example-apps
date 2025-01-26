@@ -1,7 +1,19 @@
 import * as React from "react";
 import { useEffect, useState } from 'react';
-import ResourceCard from './Resources/Card/Card';
+import { Card, CardContent, Typography } from '@mui/material';
+// import ResourceCard from './Resources/Card/Card';
 
+
+const ResourceCard = ({ title, value }) => {
+    return (
+        <Card variant="outlined" style={{ margin: '10px' }}>
+            <CardContent>
+                <Typography variant="h5">{title}</Typography>
+                <Typography variant="body1">{value}</Typography>
+            </CardContent>
+        </Card>
+    );
+};
 
 export const MoreInfo = ( props ) => {
     const [metrics, setMetrics] = useState({
@@ -34,11 +46,13 @@ export const MoreInfo = ( props ) => {
     console.log("more_info: ", metrics);
 
     return (
+      // <React.Fragment>
         <div style={{ display: 'flex', flexWrap: 'wrap' }}>
             <ResourceCard title="Resources" value={metrics.totalResources || 0} />
             <ResourceCard title="Pods" value={metrics.totalPods || 0} />
             <ResourceCard title="Out-of-Sync" value={metrics.outOfSyncCount || 0} />
         </div>
+      // </React.Fragment>
     );
 };
 
