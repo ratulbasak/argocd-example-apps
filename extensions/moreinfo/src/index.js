@@ -10,20 +10,18 @@ export const MoreInfo = ( props ) => {
         outOfSyncCount: 0,
     });
 
-    const { application, resource, tree } = props;
-    const application_name = application.metadata.name || "";
+    // const { application, tree } = props;
+    const application_name = props.application.metadata.name || "";
 
     console.log("appname: ", application_name);
-    console.log("application: ", application);
-    console.log("resource: ", resource);
-    console.log("tree: ", tree);
+    console.log("props: ", props);
 
 
     useEffect(() => {
-        if (application) {
-            const totalResources = application.status.resources.length;
-            const totalPods = tree.nodes.filter(r => r.kind === 'Pod').length;
-            const outOfSyncCount = application.status.resources.filter(r => r.status !== 'Synced').length;
+        if (props) {
+            const totalResources = props.application.status.resources.length;
+            const totalPods = props.tree.nodes.filter(r => r.kind === 'Pod').length;
+            const outOfSyncCount = props.application.status.resources.filter(r => r.status !== 'Synced').length;
 
             setMetrics({
                 totalResources,
@@ -31,7 +29,7 @@ export const MoreInfo = ( props ) => {
                 outOfSyncCount,
             });
         }
-    }, [application, tree.nodes]);
+    }, [props]);
 
     return (
         <div style={{ display: 'flex', flexWrap: 'wrap' }}>
