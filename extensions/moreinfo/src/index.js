@@ -2,14 +2,14 @@ import React, { useEffect, useState } from 'react';
 import ResourceCard from './Resources/Card/Card';
 // import { useApplication } from '@argoproj/argo-cd/src/hooks';
 
-export const MoreInfo = ({ props }) => {
+export const MoreInfo = ( props ) => {
     const [metrics, setMetrics] = useState({
         totalResources: 0,
         totalPods: 0,
         outOfSyncCount: 0,
     });
 
-    const { application, resource, tree } = props;
+    const { application = {}, resource, tree } = props;
     const application_name = application?.metadata?.name || "";
 
     console.log("application name: ", application_name);
