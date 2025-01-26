@@ -1,17 +1,17 @@
 import * as React from "react";
 import { useEffect, useState } from 'react';
-import { Card, CardContent, Typography } from '@mui/material';
+// import { Card, CardContent, Typography } from '@mui/material';
 
-const ResourceCard = ({ title, value }) => {
-    return (
-        <Card variant="outlined" style={{ margin: '10px' }}>
-            <CardContent>
-                <Typography variant="h5">{title}</Typography>
-                <Typography variant="body1">{value}</Typography>
-            </CardContent>
-        </Card>
-    );
-};
+// const ResourceCard = ({ title, value }) => {
+//     return (
+//         <Card variant="outlined" style={{ margin: '10px' }}>
+//             <CardContent>
+//                 <Typography variant="h5">{title}</Typography>
+//                 <Typography variant="body1">{value}</Typography>
+//             </CardContent>
+//         </Card>
+//     );
+// };
 
 export const MoreInfo = (props) => {
     const [metrics, setMetrics] = useState({
@@ -47,9 +47,18 @@ export const MoreInfo = (props) => {
 
     return (
         <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-            <ResourceCard title="Resources" value={metrics.totalResources || 0} />
+            <div style={{ fontSize: ".7em", color: "#6d7f8b" }}>
+              Resources {metrics.totalResources || 0}
+            </div>
+            <div style={{ fontSize: ".7em", color: "#6d7f8b" }}>
+              Pods {metrics.totalPods || 0}
+            </div>
+            <div style={{ fontSize: ".7em", color: "#6d7f8b" }}>
+              Out-of-Sync {metrics.outOfSyncCount || 0}
+            </div>
+            {/* <ResourceCard title="Resources" value={metrics.totalResources || 0} />
             <ResourceCard title="Pods" value={metrics.totalPods || 0} />
-            <ResourceCard title="Out-of-Sync" value={metrics.outOfSyncCount || 0} />
+            <ResourceCard title="Out-of-Sync" value={metrics.outOfSyncCount || 0} /> */}
         </div>
     );
 };
