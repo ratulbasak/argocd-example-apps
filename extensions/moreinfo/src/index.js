@@ -20,10 +20,8 @@ export const MoreInfo = (props) => {
         outOfSyncCount: 0,
     });
 
-    // Destructure application and tree from props
     const { application, tree } = props;
 
-    // Safely access application name
     const application_name = application?.metadata?.name || "";
 
     console.log("appname: ", application_name);
@@ -48,38 +46,44 @@ export const MoreInfo = (props) => {
     console.log("more_info: ", metrics);
 
     return (
-        <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-            <div style={{
-                width: "60px",
-                flexGrow: "1",
-                color: "#495763",
-                textAlign: "center",
-              }}
-            >
-              Resources {metrics.totalResources || 0}
-            </div>
-            <div style={{
-                width: "60px",
-                flexGrow: "1",
-                color: "#495763",
-                textAlign: "center",
-              }}
-            >
-              Pods {metrics.totalPods || 0}
-            </div>
-            <div style={{
-                width: "60px",
-                flexGrow: "1",
-                color: "#495763",
-                textAlign: "center",
-              }}
-            >
-              Out-of-Sync {metrics.outOfSyncCount || 0}
-            </div>
-            {/* <ResourceCard title="Resources" value={metrics.totalResources || 0} />
-            <ResourceCard title="Pods" value={metrics.totalPods || 0} />
-            <ResourceCard title="Out-of-Sync" value={metrics.outOfSyncCount || 0} /> */}
-        </div>
+      <div>
+        <div title={`Resources: ${metrics.totalResources || 0}`}
+            style={{
+              marginTop: "2rem",
+              padding: "0.2rem",
+              boxShadow: "1px 1px 1px #ccd6dd",
+              borderRadius: "4px",
+              border: "1px solid transparent",
+              backgroundColor: "#fff",
+              color: "#363c4a",
+              display: "flex",
+            }}
+        ></div>
+        <div title={`Pods: ${metrics.totalPods || 0}`}
+            style={{
+              marginTop: "2rem",
+              padding: "0.2rem",
+              boxShadow: "1px 1px 1px #ccd6dd",
+              borderRadius: "4px",
+              border: "1px solid transparent",
+              backgroundColor: "#fff",
+              color: "#363c4a",
+              display: "flex",
+            }}
+        ></div>
+        <div title={`Out-of-Sync: ${metrics.outOfSyncCount || 0}`}
+            style={{
+              marginTop: "2rem",
+              padding: "0.2rem",
+              boxShadow: "1px 1px 1px #ccd6dd",
+              borderRadius: "4px",
+              border: "1px solid transparent",
+              backgroundColor: "#fff",
+              color: "#363c4a",
+              display: "flex",
+            }}
+        ></div>
+      </div>
     );
 };
 
