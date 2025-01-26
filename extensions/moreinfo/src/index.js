@@ -31,13 +31,13 @@ export const MoreInfo = ( props ) => {
         }
     }, [props]);
 
+    console.log("more_info: ", metrics);
+
     return (
         <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-            <ResourceCard title="Resources" value={metrics.totalResources} />
-            <ResourceCard title="Pods" value={metrics.totalPods} />
-            <ResourceCard title="Out-of-Sync" value={metrics.outOfSyncCount} />
-            {/* <ResourceCard title="CPU Pressure" value={metrics.cpuPressure ? 'Yes' : 'No'} />
-            <ResourceCard title="Memory Pressure" value={metrics.memoryPressure ? 'Yes' : 'No'} /> */}
+            <ResourceCard title="Resources" value={metrics.totalResources || 0} />
+            <ResourceCard title="Pods" value={metrics.totalPods || 0} />
+            <ResourceCard title="Out-of-Sync" value={metrics.outOfSyncCount || 0} />
         </div>
     );
 };
