@@ -5,7 +5,7 @@ import { ExclamationCircleOutlined } from "@ant-design/icons";
 const { confirm } = Modal;
 const { Option } = Select;
 
-const ArgoCDImageUpdater = ({ appName }) => {
+const ArgoCDImageUpdater = ({ props }) => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [updating, setUpdating] = useState({});
@@ -13,6 +13,9 @@ const ArgoCDImageUpdater = ({ appName }) => {
   useEffect(() => {
     fetchImageData();
   }, []);
+
+  const { application, tree } = props;
+  const appName = application?.metadata?.name || "";
 
   const fetchImageData = async () => {
     setLoading(true);
