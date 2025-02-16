@@ -5,7 +5,7 @@ import { ExclamationCircleOutlined } from "@ant-design/icons";
 const { confirm } = Modal;
 const { Option } = Select;
 
-const ArgoCDImageUpdater = ({ props }) => {
+const ArgoCDImageUpdater = ( props ) => {
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(false);
     const [updating, setUpdating] = useState({});
@@ -128,12 +128,12 @@ const ArgoCDImageUpdater = ({ props }) => {
     return <Table columns={columns} dataSource={data} loading={loading} rowKey="resource" />;
 };
 
-export default ArgoCDImageUpdater;
+export const component = ArgoCDImageUpdater;
 
 
 ((window) => {
     window.extensionsAPI.registerResourceExtension(
-        ArgoCDImageUpdater,
+        component,
         "argoproj.io",
         "Application",
         "moreinfo"
