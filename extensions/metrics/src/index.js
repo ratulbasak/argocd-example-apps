@@ -92,27 +92,33 @@ const ArgoCDImageUpdater = ( props ) => {
 
     const handleUpdate = async (record) => {
         confirm({
-            title: "Confirm Update",
-            icon: <ExclamationCircleOutlined />,
-            content: `Update ${record.selectedImage} to tag ${record.newTag}?`,
-            onOk: async () => {
-                setUpdating((prev) => ({ ...prev, [record.resource]: true }));
-                try {
-                    await fetch(`/api/v1/applications/${appName}`, {
-                        method: "PATCH",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                            resource: record.resource,
-                            image: `${record.selectedImage}:${record.newTag}`,
-                        }),
-                    });
-                    notification.success({ message: "Image tag updated successfully" });
-                    fetchImageData();
-                } catch (error) {
-                    notification.error({ message: "Failed to update image tag" });
-                }
-                setUpdating((prev) => ({ ...prev, [record.resource]: false }));
-            },
+        title: "Confirm Update",
+        icon: <ExclamationCircleOutlined />,
+        content: `Update ${record.selectedImage} to tag ${record.newTag}?`,
+        onOk: async () => {
+            setUpdating((prev) => ({ ...prev, [record.resource]: true }));
+            try {
+            await fetch(`/api/v1/applications/${appName}`, {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                patchType: "merge",
+                operations: [
+                    {
+                    op: "replace",
+                    path: `/spec/template/spec/containers/0/image`,
+                    value: `${record.selectedImage}:${record.newTag}`,
+                    },
+                ],
+                }),
+            });
+            notification.success({ message: "Image tag updated successfully" });
+            fetchImageData();
+            } catch (error) {
+            notification.error({ message: "Failed to update image tag" });
+            }
+            setUpdating((prev) => ({ ...prev, [record.resource]: false }));
+        },
         });
     };
 
