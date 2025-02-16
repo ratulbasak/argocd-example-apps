@@ -15,8 +15,6 @@ const ArgoCDImageUpdater = ( props ) => {
 
     console.log("appname: ", appName);
     console.log("props: ", props);
-    console.log("tree: ", tree);
-    console.log("application: ", application);
 
     useEffect(() => {
         fetchImageData();
@@ -25,40 +23,72 @@ const ArgoCDImageUpdater = ( props ) => {
     const fetchImageData = async () => {
         setLoading(true);
         try {
-            const response = await fetch(`/api/v1/applications/${appName}`);
-            const result = await response.json();
-            const images = extractImages(result);
+            const resources = application.status.resources.filter(r => r.kind ===
+                "Deployment" || r.kind === "StatefulSet"
+            );
+            const images = [];
+
+            for (const resource of resources) {
+                const name = resource.name;
+                const namespace = resource.namespace;
+                const kind = resource.kind;
+                const group = kind === "Deployment" ? "apps" : "apps";
+                const version = resource.version;
+                const url = `/api/v1/applications/${appName}/resource?name=${name}&appNamespace=argocd&namespace=${namespace}&resourceName=${name}&version=${version}&kind=${kind}&group=${group}`;
+                const response = await fetch(url);
+                const result = await response.json();
+                const manifest = JSON.parse(result.manifest);
+                const containers = manifest.spec.template.spec.containers;
+                console.log(containers);
+                if (containers) {
+                    containers.forEach(container => {
+                        const [imageUrl, imageTag] = container.image.split(":");
+                        const existing = images.find((img) => img.resource === `${manifest.kind}/${manifest.metadata.name}`);
+                        if (existing) {
+                            existing.images.push({ imageUrl, imageTag, containerName: container.name });
+                        } else {
+                            images.push({
+                                resource: `${manifest.kind}/${manifest.metadata.name}`,
+                                images: [{ imageUrl, imageTag, containerName: container.name }],
+                                selectedImage: imageUrl,
+                                newTag: imageTag,
+                            });
+                        }
+                    })
+                }
+            }
             setData(images);
+            console.log("images: ", images);
         } catch (error) {
             notification.error({ message: "Failed to fetch image data" });
         }
         setLoading(false);
     };
 
-    const extractImages = (appData) => {
-        const resources = appData?.status?.resources || [];
-        const images = [];
+    // const extractImages = (appData) => {
+    //     const resources = appData?.status?.resources || [];
+    //     const images = [];
 
-        resources.forEach((res) => {
-            if (res.kind === "Deployment" || res.kind === "StatefulSet") {
-                res.spec?.template?.spec?.containers?.forEach((container) => {
-                    const [imageUrl, imageTag] = container.image.split(":");
-                    const existing = images.find((img) => img.resource === `${res.kind}/${res.metadata.name}`);
-                    if (existing) {
-                        existing.images.push({ imageUrl, imageTag, containerName: container.name });
-                    } else {
-                        images.push({
-                            resource: `${res.kind}/${res.metadata.name}`,
-                            images: [{ imageUrl, imageTag, containerName: container.name }],
-                            selectedImage: imageUrl,
-                            newTag: imageTag,
-                        });
-                    }
-                });
-            }
-        });
-        return images;
-    };
+    //     resources.forEach((res) => {
+    //         if (res.kind === "Deployment" || res.kind === "StatefulSet") {
+    //             res.spec?.template?.spec?.containers?.forEach((container) => {
+    //                 const [imageUrl, imageTag] = container.image.split(":");
+    //                 const existing = images.find((img) => img.resource === `${res.kind}/${res.metadata.name}`);
+    //                 if (existing) {
+    //                     existing.images.push({ imageUrl, imageTag, containerName: container.name });
+    //                 } else {
+    //                     images.push({
+    //                         resource: `${res.kind}/${res.metadata.name}`,
+    //                         images: [{ imageUrl, imageTag, containerName: container.name }],
+    //                         selectedImage: imageUrl,
+    //                         newTag: imageTag,
+    //                     });
+    //                 }
+    //             });
+    //         }
+    //     });
+    //     return images;
+    // };
 
     const handleUpdate = async (record) => {
         confirm({
