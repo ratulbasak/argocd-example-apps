@@ -117,14 +117,20 @@ const ArgoCDImageUpdater = ( props ) => {
                 const payload = JSON.stringify({ spec: { template: { spec: updatedSpec}} });
                 console.log("payload: ", JSON.stringify(payload));
                 
-                await fetch(url, {
+                const response = await fetch(url, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(payload),
                 });
 
+                if (!response.ok) {
+                    notification.error({ message: "Failed to update image tag" });
+                    throw new Error("Failed to update image tag");
+                }
+
                 notification.success({ message: "Image tag updated successfully" });
-                fetchImageData();
+                await fetchImageData();
+                
             } catch (error) {
                 notification.error({ message: "Failed to update image tag" });
             }
