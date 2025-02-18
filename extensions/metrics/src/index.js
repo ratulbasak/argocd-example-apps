@@ -95,7 +95,17 @@ const ArgoCDImageUpdater = ( props ) => {
     //     return images;
     // };
 
+    const validateTag = (tag) => {
+        const regex = /^[a-zA-Z0-9._-]+$/;
+        return regex.test(tag);
+    };
+
     const handleUpdate = async (record) => {
+        if (!validateTag(record.newTag)) {
+            notification.error({ message: "Invalid tag format. Use alphanumeric, dots, underscores, or hyphens." });
+            return;
+        }
+        
         confirm({
         title: "Confirm Update",
         icon: <ExclamationCircleOutlined />,
@@ -130,7 +140,7 @@ const ArgoCDImageUpdater = ( props ) => {
 
                 notification.success({ message: "Image tag updated successfully" });
                 await fetchImageData();
-                
+
             } catch (error) {
                 notification.error({ message: "Failed to update image tag" });
             }
