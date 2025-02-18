@@ -35,6 +35,7 @@ const ArgoCDImageUpdater = ( props ) => {
                 const group = kind === "Deployment" ? "apps" : "apps";
                 const version = resource.version;
                 const url = `/api/v1/applications/${appName}/resource?name=${name}&appNamespace=argocd&namespace=${namespace}&resourceName=${name}&version=${version}&kind=${kind}&group=${group}`;
+                console.log("_call: ", url);
                 const response = await fetch(url);
                 const result = await response.json();
                 const manifest = JSON.parse(result.manifest);
@@ -52,6 +53,10 @@ const ArgoCDImageUpdater = ( props ) => {
                                 images: [{ imageUrl, imageTag, containerName: container.name }],
                                 selectedImage: imageUrl,
                                 newTag: imageTag,
+                                metadata: manifest.metadata,
+                                apiVersion: manifest.apiVersion,
+                                kind: manifest.kind,
+                                spec: manifest.spec,
                             });
                         }
                     })
@@ -98,24 +103,28 @@ const ArgoCDImageUpdater = ( props ) => {
         onOk: async () => {
             setUpdating((prev) => ({ ...prev, [record.resource]: true }));
             try {
-            await fetch(`/api/v1/applications/${appName}`, {
-                method: "PATCH",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                patchType: "merge",
-                operations: [
-                    {
-                    op: "replace",
-                    path: `/spec/template/spec/containers/0/image`,
-                    value: `${record.selectedImage}:${record.newTag}`,
-                    },
-                ],
-                }),
-            });
-            notification.success({ message: "Image tag updated successfully" });
-            fetchImageData();
+                const url = `/api/v1/applications/${appName}/resource?name=${record.metadata.name}&appNamespace=argocd&namespace=${record.metadata.namespace}&resourceName=${record.metadata.name}&version=${record.apiVersion.split("/").pop()}&kind=${record.kind}&group=${record.apiVersion.includes("/") ? record.apiVersion.split("/")[0] : ""}&patchType=application%2Fmerge-patch%2Bjson`;
+
+                const updatedSpec = JSON.parse(JSON.stringify(record.spec));
+                updatedSpec.template.spec.containers = updatedSpec.template.spec.containers.map((container) => {
+                    if (container.image.startsWith(record.selectedImage)) {
+                    container.image = `${record.selectedImage}:${record.newTag}`;
+                    }
+                    return container;
+                });
+                
+                const payload = { spec: updatedSpec };
+                
+                await fetch(url, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload),
+                });
+
+                notification.success({ message: "Image tag updated successfully" });
+                fetchImageData();
             } catch (error) {
-            notification.error({ message: "Failed to update image tag" });
+                notification.error({ message: "Failed to update image tag" });
             }
             setUpdating((prev) => ({ ...prev, [record.resource]: false }));
         },
