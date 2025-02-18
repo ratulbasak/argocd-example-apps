@@ -114,12 +114,13 @@ const ArgoCDImageUpdater = ( props ) => {
                     return container;
                 });
                 
-                const payload = { spec: { template: { spec: updatedSpec}} };
+                const payload = JSON.stringify({ spec: { template: { spec: updatedSpec}} });
+                console.log("payload: ", payload);
                 
                 await fetch(url, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(payload),
+                    body: payload,
                 });
 
                 notification.success({ message: "Image tag updated successfully" });
