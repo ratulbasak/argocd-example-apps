@@ -56,7 +56,7 @@ const ArgoCDImageUpdater = ( props ) => {
                                 metadata: manifest.metadata,
                                 apiVersion: manifest.apiVersion,
                                 kind: manifest.kind,
-                                spec: manifest.spec,
+                                spec: manifest.spec.template.spec,
                             });
                         }
                     })
@@ -106,14 +106,15 @@ const ArgoCDImageUpdater = ( props ) => {
                 const url = `/api/v1/applications/${appName}/resource?name=${record.metadata.name}&appNamespace=argocd&namespace=${record.metadata.namespace}&resourceName=${record.metadata.name}&version=${record.apiVersion.split("/").pop()}&kind=${record.kind}&group=${record.apiVersion.includes("/") ? record.apiVersion.split("/")[0] : ""}&patchType=application%2Fmerge-patch%2Bjson`;
 
                 const updatedSpec = JSON.parse(JSON.stringify(record.spec));
-                updatedSpec.template.spec.containers = updatedSpec.template.spec.containers.map((container) => {
+                console.log("updatedSpec: ", updatedSpec);
+                updatedSpec.containers = updatedSpec.containers.map((container) => {
                     if (container.image.startsWith(record.selectedImage)) {
                     container.image = `${record.selectedImage}:${record.newTag}`;
                     }
                     return container;
                 });
                 
-                const payload = { spec: updatedSpec };
+                const payload = { spec: { template: { spec: updatedSpec}} };
                 
                 await fetch(url, {
                     method: "POST",
