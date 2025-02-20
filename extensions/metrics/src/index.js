@@ -201,7 +201,7 @@ const ArgoCDImageUpdater = ( props ) => {
             onChange={(e) => setSearchTerm(e.target.value)}
             style={{ marginBottom: 16 }}
         />
-        <Table columns={columns} dataSource={filteredData} loading={loading} rowKey="resource" />
+        <Table columns={columns} dataSource={filteredData} loading={loading} rowKey="resource" pagination={{showSizeChanger: true,}} />
     </div>
     );
 };
