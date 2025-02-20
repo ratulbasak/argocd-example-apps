@@ -150,6 +150,10 @@ const ArgoCDImageUpdater = ( props ) => {
         });
     };
 
+    const filteredData = data.filter(item => 
+        item.resource && item.resource.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
     const columns = [
         { title: "Resource", dataIndex: "resource", key: "resource" },
         {
@@ -197,7 +201,7 @@ const ArgoCDImageUpdater = ( props ) => {
             onChange={(e) => setSearchTerm(e.target.value)}
             style={{ marginBottom: 16 }}
         />
-        <Table columns={columns} dataSource={data} loading={loading} rowKey="resource" />
+        <Table columns={columns} dataSource={filteredData} loading={loading} rowKey="resource" />
     </div>
     );
 };
