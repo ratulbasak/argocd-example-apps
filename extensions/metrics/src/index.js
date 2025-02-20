@@ -9,6 +9,7 @@ const ArgoCDImageUpdater = ( props ) => {
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(false);
     const [updating, setUpdating] = useState({});
+    const [searchTerm, setSearchTerm] = useState("");
 
     const { application, tree } = props;
     const appName = application?.metadata?.name || "";
@@ -105,7 +106,7 @@ const ArgoCDImageUpdater = ( props ) => {
             notification.error({ message: "Invalid tag format. Use alphanumeric, dots, underscores, or hyphens." });
             return;
         }
-        
+
         confirm({
         title: "Confirm Update",
         icon: <ExclamationCircleOutlined />,
@@ -188,7 +189,17 @@ const ArgoCDImageUpdater = ( props ) => {
         },
     ];
 
-    return <Table columns={columns} dataSource={data} loading={loading} rowKey="resource" />;
+    return (
+    <div>
+        <Input
+            placeholder="Search by resource name"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            style={{ marginBottom: 16 }}
+        />
+        <Table columns={columns} dataSource={data} loading={loading} rowKey="resource" />
+    </div>
+    );
 };
 
 export const component = ArgoCDImageUpdater;
