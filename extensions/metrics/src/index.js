@@ -5,17 +5,18 @@ import { ExclamationCircleOutlined } from "@ant-design/icons";
 const { confirm } = Modal;
 const { Option } = Select;
 
-const ArgoCDImageUpdater = ( props ) => {
+const ArgoCDImageUpdater = ( application, resource, tree  ) => {
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(false);
     const [updating, setUpdating] = useState({});
     const [searchTerm, setSearchTerm] = useState("");
 
-    const { application, tree } = props;
+    // const { application, tree } = props;
     const appName = application?.metadata?.name || "";
 
     console.log("appname: ", appName);
-    console.log("props: ", props);
+    console.log("resource: ", resource);
+    console.log("tree: ", tree);
 
     useEffect(() => {
         fetchImageData();
