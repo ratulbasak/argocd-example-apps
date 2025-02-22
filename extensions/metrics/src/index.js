@@ -11,11 +11,11 @@ const ArgoCDImageUpdater = ( props ) => {
     const [updating, setUpdating] = useState({});
     const [searchTerm, setSearchTerm] = useState("");
 
-    const { application, state, tree } = props;
+    const { application, tree } = props;
     const appName = application?.metadata?.name || "";
 
     console.log("appname: ", appName);
-    console.log("state: ", state);
+    // console.log("state: ", state);
     console.log("tree: ", tree);
 
     useEffect(() => {
