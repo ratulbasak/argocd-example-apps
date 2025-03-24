@@ -161,3 +161,13 @@ const ArgoCDImageUpdater = ( props ) => {
 };
 
 export const component = ArgoCDImageUpdater;
+
+
+((window) => {
+    window.extensionsAPI.registerResourceExtension(
+        component,
+        "argoproj.io",
+        "Application",
+        "moreinfo"
+    );
+})(window);
