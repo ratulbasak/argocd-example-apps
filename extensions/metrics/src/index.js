@@ -152,7 +152,9 @@ const ArgoCDImageUpdater = (props) => {
                         value={value}
                         onChange={(e) => setData((prev) => prev.map((item) => item.resource === record.resource ? { ...item, newTag: e.target.value } : item))}
                     />
-                    <Select style={{ width: '100%', marginTop: 4 }} value={value} disabled>
+                    <Select style={{ width: '100%', marginTop: 4 }} value={record.newTag} onChange={(val) => {
+                        setData(prev => prev.map(item => item.resource === record.resource ? { ...item, newTag: val } : item));
+                    }}>
                         {record.images.find(img => img.imageUrl === record.selectedImage)?.history.map((tag, index) => (
                             <Option key={index} value={tag}>{tag}</Option>
                         ))}
