@@ -5,12 +5,11 @@ import { ExclamationCircleOutlined } from "@ant-design/icons";
 const { confirm } = Modal;
 const { Option } = Select;
 
-const ArgoCDImageUpdater = ( props ) => {
+const ArgoCDImageUpdater = (props) => {
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(false);
     const [updating, setUpdating] = useState({});
     const [searchTerm, setSearchTerm] = useState("");
-    const [updateHistory, setUpdateHistory] = useState({});
 
     const { application, tree } = props;
     const appName = application?.metadata?.name || "";
@@ -29,24 +28,25 @@ const ArgoCDImageUpdater = ( props ) => {
                 const name = resource.name;
                 const namespace = resource.namespace;
                 const kind = resource.kind;
-                const group = kind === "Deployment" ? "apps" : "apps";
+                const group = "apps";
                 const version = resource.version;
                 const url = `/api/v1/applications/${appName}/resource?name=${name}&appNamespace=argocd&namespace=${namespace}&resourceName=${name}&version=${version}&kind=${kind}&group=${group}`;
+                
                 const response = await fetch(url);
                 const result = await response.json();
                 const manifest = JSON.parse(result.manifest);
                 const containers = manifest.spec.template.spec.containers;
-
+                
                 if (containers) {
                     containers.forEach(container => {
                         const [imageUrl, imageTag] = container.image.split(":");
                         const existing = images.find((img) => img.resource === `${manifest.kind}/${manifest.metadata.name}`);
                         if (existing) {
-                            existing.images.push({ imageUrl, imageTag, containerName: container.name });
+                            existing.images.push({ imageUrl, imageTag, containerName: container.name, history: [] });
                         } else {
                             images.push({
                                 resource: `${manifest.kind}/${manifest.metadata.name}`,
-                                images: [{ imageUrl, imageTag, containerName: container.name }],
+                                images: [{ imageUrl, imageTag, containerName: container.name, history: [] }],
                                 selectedImage: imageUrl,
                                 newTag: imageTag,
                                 metadata: manifest.metadata,
@@ -55,7 +55,7 @@ const ArgoCDImageUpdater = ( props ) => {
                                 spec: manifest.spec.template.spec,
                             });
                         }
-                    })
+                    });
                 }
             }
             setData(images);
@@ -98,19 +98,18 @@ const ArgoCDImageUpdater = ( props ) => {
 
                     notification.success({ message: "Image tag updated successfully" });
                     
-                    setUpdateHistory((prev) => {
-                        const newHistory = { ...prev };
-                        if (!newHistory[record.resource]) {
-                            newHistory[record.resource] = [];
+                    setData((prev) => prev.map(item => {
+                        if (item.resource === record.resource) {
+                            return {
+                                ...item,
+                                images: item.images.map(img => img.imageUrl === record.selectedImage ? {
+                                    ...img,
+                                    history: [record.newTag, ...img.history].slice(0, 5)
+                                } : img)
+                            };
                         }
-                        newHistory[record.resource].unshift({ image: record.selectedImage, tag: record.newTag });
-                        if (newHistory[record.resource].length > 5) {
-                            newHistory[record.resource].pop();
-                        }
-                        return newHistory;
-                    });
-                    
-                    await fetchImageData();
+                        return item;
+                    }));
                 } catch (error) {
                     notification.error({ message: "Failed to update image tag" });
                 }
@@ -119,6 +118,10 @@ const ArgoCDImageUpdater = ( props ) => {
         });
     };
 
+    const filteredData = data.filter(item => 
+        item.resource && item.resource.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
     const columns = [
         { title: "Resource", dataIndex: "resource", key: "resource" },
         {
@@ -126,8 +129,14 @@ const ArgoCDImageUpdater = ( props ) => {
             dataIndex: "selectedImage",
             key: "selectedImage",
             render: (value, record) => (
-                <Select value={value} onChange={(val) => setData((prev) => prev.map((item) => item.resource === record.resource ? { ...item, selectedImage: val, newTag: item.images.find(img => img.imageUrl === val)?.imageTag || "" } : item))}>
-                    {record.images.map((img) => (
+                <Select value={value} onChange={(val) => {
+                    setData(prev => prev.map(item => item.resource === record.resource ? {
+                        ...item,
+                        selectedImage: val,
+                        newTag: item.images.find(img => img.imageUrl === val)?.imageTag || ""
+                    } : item));
+                }}>
+                    {record.images.map(img => (
                         <Option key={img.imageUrl} value={img.imageUrl}>{img.imageUrl}</Option>
                     ))}
                 </Select>
@@ -139,12 +148,15 @@ const ArgoCDImageUpdater = ( props ) => {
             key: "newTag",
             render: (value, record) => (
                 <div>
-                    <Input value={value} onChange={(e) => setData((prev) => prev.map((item) => item.resource === record.resource ? { ...item, newTag: e.target.value } : item))} />
-                    <ul>
-                        {updateHistory[record.resource]?.map((update, index) => (
-                            <li key={index}>{update.image}:{update.tag}</li>
+                    <Input
+                        value={value}
+                        onChange={(e) => setData((prev) => prev.map((item) => item.resource === record.resource ? { ...item, newTag: e.target.value } : item))}
+                    />
+                    <Select style={{ width: '100%', marginTop: 4 }} value={value} disabled>
+                        {record.images.find(img => img.imageUrl === record.selectedImage)?.history.map((tag, index) => (
+                            <Option key={index} value={tag}>{tag}</Option>
                         ))}
-                    </ul>
+                    </Select>
                 </div>
             ),
         },
@@ -157,7 +169,18 @@ const ArgoCDImageUpdater = ( props ) => {
         },
     ];
 
-    return <Table columns={columns} dataSource={data} loading={loading} rowKey="resource" />;
+    return (
+        <div>
+            <Input
+                placeholder="Search by resource name"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                style={{ marginBottom: 16 }}
+            />
+            <Table columns={columns} dataSource={filteredData} loading={loading} rowKey="resource" />
+        </div>
+    )
+    ;
 };
 
 export const component = ArgoCDImageUpdater;
